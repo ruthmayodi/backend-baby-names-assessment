@@ -34,7 +34,7 @@ Suggested milestones for incremental development:
 import sys
 import re
 import argparse
-
+__author__ = "Ruth Mayodi, ruthmayodi with the help of Howard Post"
 
 def extract_names(filename):
     """
@@ -44,7 +44,23 @@ def extract_names(filename):
     ['2006', 'Aaliyah 91', 'Aaron 57', 'Abagail 895', ...]
     """
     names = []
-    # +++your code here+++
+    name_pattern = re.compile(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>')
+    year_pattern = re.compile(r'Popularity\sin\s(\d\d\d\d)')
+    names_dict = {}
+    with open (filename) as f:
+        for line in f:
+            year = year_pattern.search(line)
+            if year:
+                names.append(year.group(1))
+            name_match = name_pattern.search(line)
+            if name_match:
+                if name_match.group(2) not in names_dict:
+                    names_dict[name_match.group(2)] = name_match.group(1)
+                if name_match.group(3) not in names_dict:
+                    names_dict[name_match.group(3)] = name_match.group(1)
+    temp_dict = list(sorted(names_dict.items()))
+    for name in temp_dict:
+        names.append(name[0]+ " "+ name[1])
     return names
 
 
@@ -82,8 +98,15 @@ def main(args):
     # Use the create_summary flag to decide whether to print the list
     # or to write the list to a summary file (e.g. `baby1990.html.summary`).
 
-    # +++your code here+++
-
+    for file in file_list:
+        filename = file + '.summary'
+        results = '\n'.join(extract_names(file))
+        if create_summary:
+            f = open(filename, 'a')
+            f.write(results)
+            f.close()
+        else:
+            print(results)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
